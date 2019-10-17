@@ -1,0 +1,37 @@
+{
+    "data_config": {
+        "name": "bball",
+        "player_types":  {
+            "ball": false,
+            "offense": true,
+            "defense": false
+        },
+        "subsample": 2,
+        "single_agent": true,
+        "labels": [
+            {
+                "name": "destination",
+                "xy": [-0.213, 0.0],
+                "time_index": -1,
+                "thresholds": [0.25, 0.39]
+            }
+        ]
+    },
+    "model_config": {
+        "name": "ctvae_mi",
+        "z_dim": 4,
+        "h_dim": 128,
+        "rnn_dim": 128,
+        "num_layers": 1,
+        "dynamics_h_dim": 128,
+        "H_step": 1,
+        "n_collect": 0
+    },
+    "train_config": {
+        "batch_size": 128,
+        "checkpoint_freq": 15,
+        "learning_rate": 0.0002,
+        "num_epochs": [1,1],
+        "clip": 10
+    }
+}
