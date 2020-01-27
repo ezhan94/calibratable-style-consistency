@@ -89,7 +89,7 @@ class CTVAE_style(BaseSequentialModel):
     def _define_losses(self):
         self.log.add_loss('kl_div')
         self.log.add_loss('nll')
-        self.log.add_loss('state_RMSE')
+        self.log.add_loss('state_error')
         self.log.add_metric('kl_div_true')
 
         for lf in self.config['label_functions']:
@@ -129,7 +129,7 @@ class CTVAE_style(BaseSequentialModel):
 
         if self.stage == 1 or (self.stage >= 3 and self.config['n_collect'] > 0):
             self.dynamics_optimizer.zero_grad()
-            dynamics_loss = losses['state_RMSE']
+            dynamics_loss = losses['state_error']
             dynamics_loss.backward(retain_graph=True)
             nn.utils.clip_grad_norm_(self.dynamics_params(), 10)
             self.dynamics_optimizer.step()
@@ -144,7 +144,7 @@ class CTVAE_style(BaseSequentialModel):
 
         if self.stage >= 3:
             self.ctvaep_optimizer.zero_grad()
-            ctvaep_losses = [ value for key,value in losses.items() if 'state_RMSE' not in key ]
+            ctvaep_losses = [ value for key,value in losses.items() if 'state_error' not in key ]
             ctvaep_loss = sum(ctvaep_losses)
             ctvaep_loss.backward(retain_graph=True)
             nn.utils.clip_grad_norm_(self.ctvaep_params(), 10)
@@ -184,22 +184,22 @@ class CTVAE_style(BaseSequentialModel):
         return self.dynamics_model(state_action_pair)
 
     def compute_dynamics_loss(self, states ,actions):
-        # for t in range(actions.size(0)):
-        #     state_change = self.propogate_forward(states[t], actions[t])
-        #     self.log.losses['state_RMSE'] += F.mse_loss(state_change, states[t+1]-states[t], reduction='sum')
+        for t in range(actions.size(0)):
+            state_change = self.propogate_forward(states[t], actions[t])
+            self.log.losses['state_error'] += F.mse_loss(state_change, states[t+1]-states[t], reduction='sum')
                 
-        assert actions.size(1) >= self.config['H_step'] # enough transitions for H_step loss
+        # assert actions.size(1) >= self.config['H_step'] # enough transitions for H_step loss
 
-        for t in range(states.size(0)-self.config['H_step']):
-            curr_state = states[t]
-            for h in range(self.config['H_step']):
-                state_change = self.propogate_forward(curr_state, actions[t+h])
-                curr_state += state_change
+        # for t in range(states.size(0)-self.config['H_step']):
+        #     curr_state = states[t]
+        #     for h in range(self.config['H_step']):
+        #         state_change = self.propogate_forward(curr_state, actions[t+h])
+        #         curr_state += state_change
 
-                mse_elements = F.mse_loss(state_change, states[t+h+1]-states[t+h], reduction='none')
-                rmse = torch.sqrt(torch.sum(mse_elements, dim=1))
+        #         mse_elements = F.mse_loss(state_change, states[t+h+1]-states[t+h], reduction='none')
+        #         rmse = torch.sqrt(torch.sum(mse_elements, dim=1))
 
-                self.log.losses['state_RMSE'] += torch.sum(rmse)
+        #         self.log.losses['state_error'] += torch.sum(rmse)
 
     def forward(self, states, actions, labels_dict, env):
         self.log.reset()
