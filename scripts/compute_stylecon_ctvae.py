@@ -153,7 +153,7 @@ if __name__ == '__main__':
                         required=False, default='saved',
                         help='save directory for experiments from project directory')
     parser.add_argument('-n', '--num_samples', type=int,
-                        required=False, default=4000,
+                        required=False, default=200,
                         help='total number of samples')
     parser.add_argument('-v', '--num_values', type=int,
                         required=False, default=20,

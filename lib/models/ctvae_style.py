@@ -9,8 +9,8 @@ from lib.distributions import Normal
 class CTVAE_style(BaseSequentialModel):
 
     name = 'ctvae_style' # conditional trajectory VAE policy w/ dynamics model and w/ style-consistency
-    model_args = ['state_dim', 'action_dim', 'z_dim', 'h_dim', 'rnn_dim', 'num_layers', 'dynamics_h_dim', 'H_step']
-    model_args += ['dynamics_h_dim', 'H_step', 'n_collect']
+    model_args = ['state_dim', 'action_dim', 'z_dim', 'h_dim', 'rnn_dim', 'num_layers', 'dynamics_h_dim']
+    model_args += ['dynamics_h_dim', 'n_collect']
     requires_labels = True
     requires_environment = True
 
@@ -187,19 +187,6 @@ class CTVAE_style(BaseSequentialModel):
         for t in range(actions.size(0)):
             state_change = self.propogate_forward(states[t], actions[t])
             self.log.losses['state_error'] += F.mse_loss(state_change, states[t+1]-states[t], reduction='sum')
-                
-        # assert actions.size(1) >= self.config['H_step'] # enough transitions for H_step loss
-
-        # for t in range(states.size(0)-self.config['H_step']):
-        #     curr_state = states[t]
-        #     for h in range(self.config['H_step']):
-        #         state_change = self.propogate_forward(curr_state, actions[t+h])
-        #         curr_state += state_change
-
-        #         mse_elements = F.mse_loss(state_change, states[t+h+1]-states[t+h], reduction='none')
-        #         rmse = torch.sqrt(torch.sum(mse_elements, dim=1))
-
-        #         self.log.losses['state_error'] += torch.sum(rmse)
 
     def forward(self, states, actions, labels_dict, env):
         self.log.reset()
@@ -281,7 +268,8 @@ class CTVAE_style(BaseSequentialModel):
         for t in range(T):
             with torch.no_grad():
                 action = self.act(obs[:,:self.config['state_dim']])
-                # action = torch.clamp(action, min=-1.0, max=1.0) # TODO hack for mujoco, should be in env
+                if 'mode' in self.config and self.config['mode'] == 'mujoco':
+                    action = torch.clamp(action, min=-1.0, max=1.0) # TODO hack for mujoco, should be in env
                 obs, reward, done, _ = env.step(action)
 
             states[t+1] = obs
