@@ -2,7 +2,7 @@
 
 ## Demo
 
-The demo will be up during ICML 2020 [here](http://basketball-ai.com/).
+The demo will be live during ICML 2020 [here](http://basketball-ai.com/).
 
 ## Code
 
