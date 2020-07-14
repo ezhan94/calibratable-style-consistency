@@ -1,5 +1,9 @@
 # Learning Calibratable Policies using Programmatic Style-Consistency [(arXiv)](https://arxiv.org/abs/1910.01179)
 
+## Demo
+
+The demo will be up during ICML 2020 [here](http://basketball-ai.com/).
+
 ## Code
 
 Code is written in Python 3.7.4 and [PyTorch](https://pytorch.org/) v.1.0.1. Will be updated for PyTorch 1.3 in the future.
