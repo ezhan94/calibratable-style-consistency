@@ -22,8 +22,9 @@ Not specifying a device will use CPU by default. See JSONs in `configs\` to see 
 
 ### Data
 
-`util/datasets/bball/data/` contains mock data, as the basketball dataset is not publically available (yet). <br>
-The test run above should still work.
+**[Update 11/25/20]** The basketball dataset is now available on [AWS Data Exchange](https://aws.amazon.com/marketplace/pp/prodview-7kigo63d3iln2?qid=1606330770194&sr=0-1&ref_=srh_res_product_title#offers). Please make sure to acknowledge Stats Perform if you use the data for your research. <br>
+
+Download the basketball data into `util/datasets/bball/data/` (currently contains mock data).
 
 To use your own data, you will need to create a new dataset in `util/datasets/` and create a new config folder in `configs/`.
 
